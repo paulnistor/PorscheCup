@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#3F51B5</color>
+    <color name="porscheBackground">#e5e6e5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-
+    <color name="white">#FFFFFF</color>
     <color name="yellow_highlight">#FDDA43</color>
     <color name="pale">#8A909A</color>
     <color name="lightClay">#555960</color>
@@ -12,7 +13,7 @@
     <color name="midClay">#4B4F55</color>
     <color name="darkClay">#313439</color>
     <color name="nocturne">#1F2225</color>
-
+    <color name="black">#000000</color>
     <color name="highlight">@color/yellow_highlight</color>
     <color name="background">@color/clay</color>
     <color name="list_item_divider">@color/edge</color>

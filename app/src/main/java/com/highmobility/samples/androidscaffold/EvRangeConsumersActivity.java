@@ -29,74 +29,58 @@ import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.highmobility.autoapi.Capabilities;
-import com.highmobility.autoapi.Charging;
+import com.highmobility.autoapi.Climate;
 import com.highmobility.autoapi.Command;
 import com.highmobility.autoapi.CommandResolver;
-import com.highmobility.autoapi.Diagnostics;
-import com.highmobility.autoapi.Doors;
-import com.highmobility.autoapi.FailureMessage;
-import com.highmobility.autoapi.VehicleInformation;
-import com.highmobility.autoapi.VehicleLocation;
-import com.highmobility.autoapi.value.Location;
-import com.highmobility.autoapi.value.Lock;
-import com.highmobility.autoapi.value.LockState;
 import com.highmobility.crypto.value.DeviceSerial;
-import com.highmobility.hmkit.Broadcaster;
-import com.highmobility.hmkit.BroadcasterListener;
-import com.highmobility.hmkit.ConnectedLink;
-import com.highmobility.hmkit.ConnectedLinkListener;
 import com.highmobility.hmkit.HMKit;
-import com.highmobility.hmkit.Link;
 import com.highmobility.hmkit.Telematics;
-import com.highmobility.hmkit.error.AuthenticationError;
-import com.highmobility.hmkit.error.BroadcastError;
 import com.highmobility.hmkit.error.DownloadAccessCertificateError;
-import com.highmobility.hmkit.error.LinkError;
 import com.highmobility.hmkit.error.TelematicsError;
+import com.highmobility.samples.androidscaffold.utils.Vehicle;
 import com.highmobility.value.Bytes;
 
-import org.w3c.dom.Text;
+import java.text.DecimalFormat;
 
 import timber.log.Timber;
 
 import static timber.log.Timber.d;
 import static timber.log.Timber.e;
 
-public class MainActivity extends Activity {
+public class EvRangeConsumersActivity extends Activity {
 
     Button btn;
-    TextView txt;
+    ProgressBar progressBarClima;
+    ProgressBar progressBarSpeed;
+    ProgressBar progressBarOutsideTemp;
+    ProgressBar progressBarBatteryLevel;
+    TextView txtKmH;
+    TextView txtOutsideTemperature;
+    TextView txtEstimatedRange;
+
+
     DeviceSerial xSerial;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        btn = findViewById(R.id.btn);
-        txt = findViewById(R.id.txt);
-        Timber.plant(new Timber.DebugTree()); // enable HMKit logging
-        /*
-         * Before using HMKit, you'll have to initialise the HMKit singleton
-         * with a snippet from the Platform Workspace:
-         *
-         *   1. Sign in to the workspace
-         *   2. Go to the LEARN section and choose Android
-         *   3. Follow the Getting Started instructions
-         *
-         * By the end of the tutorial you will have a snippet for initialisation,
-         * that looks something like this:
-         *
-         *   HMKit.getInstance().initialise(
-         *     Base64String,
-         *     Base64String,
-         *     Base64String,
-         *     getApplicationContext()
-         *   );
-         */
 
-        // PASTE THE SNIPPET HERE
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_ev_range_consumers);
+        btn = findViewById(R.id.btnStart);
+        progressBarClima = findViewById(R.id.progressBarClima3);
+        progressBarSpeed = findViewById(R.id.progressBarSpeed);
+        progressBarOutsideTemp = findViewById(R.id.progressBarOutsideTemp);
+        txtKmH = findViewById(R.id.txtKmH);
+        txtOutsideTemperature = findViewById(R.id.txtOutsideTemp);
+        progressBarBatteryLevel = findViewById(R.id.progressBarBatteryLevel);
+        txtEstimatedRange = findViewById(R.id.txtEstimatedRange);
+
+
+
+
+        Timber.plant(new Timber.DebugTree());
         HMKit.getInstance().initialise(
                 "dGVzdAQMe2ocy/rrvZueL9uvabpY1Cv/n30fRYWgukeOHcQCHLePdX1a33cgQ+6rKaR+E4l615VDjcMgHa/YR/p60n7pdEbZngdfJ1mFqOetQ6k1fc/UurMJNIACBQga9vCL2IgWKyJr164/5d8+tvLYXqAcubNas9vECAoqLHuYUoVTIdJzBLhJ9IR4VDb+WSn6Ssp/t8Ax",
                 "zykD/yIDdysaOtWPJoPY4J+BlLahzfBorRW/VwrFm/c=",
@@ -104,18 +88,12 @@ public class MainActivity extends Activity {
                 getApplicationContext()
         );
 
-
-        /*
-         * Also, the access token from the emulator should be pasted here
-         */
         String accessToken = "f80014e6-af21-4563-9e29-911c9934fad0";
 
         HMKit.getInstance().downloadAccessCertificate(accessToken, new HMKit.DownloadCallback() {
             @Override
             public void onDownloaded(DeviceSerial serial) {
                 d("Certificate downloaded for vehicle: %s", serial);
-                // Send command to the car through Telematics, make sure that the emulator is
-                // opened for this to work, otherwise "Vehicle asleep" will be returned
                 xSerial= serial;
 
             }
@@ -125,19 +103,37 @@ public class MainActivity extends Activity {
                 e("Could not download a certificate with token: %s", error.getMessage());
             }
         });
+
     }
 
 
 
     public void onClick(View v){
         Vehicle vehicle = new Vehicle(xSerial);
+        DecimalFormat df2 = new DecimalFormat("#.##");
+        progressBarClima.setProgress(10);
+        progressBarBatteryLevel.setProgress(100);
+        progressBarOutsideTemp.setProgress(20);
         new CountDownTimer( 60000, 1000) {
             @Override
             public void onTick(long l) {
-                //Log.d("Speed: ", String.valueOf(vehicle.getSpeed()));
-                //Log.d("ChargingLevel: ", String.valueOf(vehicle.getBatteryLevel()));
-                //Log.d("OutsideTemp: ", String.valueOf(vehicle.getOutsideTemperature()));
-                Log.d("HvacStatus: ", vehicle.getHvacStatus());
+
+                progressBarSpeed.setProgress((int) vehicle.getSpeed());
+                txtKmH.setText(String.valueOf(vehicle.getSpeed())+ " Km/h");
+
+
+                String outsideTemp = df2.format(vehicle.getOutsideTemperature());
+                txtOutsideTemperature.setText(outsideTemp + " °C");
+
+                double btLevel = vehicle.getBatteryLevel();
+                double btLevelMultiplied = btLevel * 100;
+                int batteryLevelFinal = (int) btLevelMultiplied;
+
+                progressBarBatteryLevel.setProgress(batteryLevelFinal);
+
+                txtEstimatedRange.setText(String.valueOf(vehicle.getBatteryRange())+ " Km/h");
+
+
             }
 
             @Override
@@ -147,5 +143,7 @@ public class MainActivity extends Activity {
         }.start();
 
     }
+
+
 
 }

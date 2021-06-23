@@ -1,4 +1,4 @@
-package com.highmobility.samples.androidscaffold;
+package com.highmobility.samples.androidscaffold.utils;
 
 import android.util.Log;
 
@@ -16,16 +16,19 @@ import com.highmobility.value.Bytes;
 public class Vehicle {
 
     private DeviceSerial serial;
-    private double batteryLevel;
+    private double batteryLevel = 1;
     private double speed;
-    private double outsideTemperature;
+    private double outsideTemperature = -15;
     private String hvacStatus= "test";
+    private double batteryRange;
 
-    Vehicle(DeviceSerial serial){
+    public Vehicle(DeviceSerial serial){
 
         this.serial = serial;
     }
+
     ////////////////////////////////Block Start: memberAccess///////////////////////////////////////
+
     public double getBatteryLevel(){
         updateBatteryLevel();
         return this.batteryLevel;
@@ -45,9 +48,16 @@ public class Vehicle {
         updateHvacStatus();
         return this.hvacStatus;
     }
+
+    public double getBatteryRange(){
+        updateBatteryRange();
+        return this.batteryRange;
+    }
+
     //////////////////////////////////Block End: memberAccess///////////////////////////////////////
 
     //////////////////////////////////Block Start: setNewValues/////////////////////////////////////
+
     private void setBatteryLevel(double batteryLevel){
         this.batteryLevel = batteryLevel;
     }
@@ -63,9 +73,15 @@ public class Vehicle {
     private void setHvacStatus(String hvacStatus){
         this.hvacStatus = hvacStatus;
     }
+
+    private void setBatteryRange(double batteryRange){
+        this.batteryRange = batteryRange;
+    }
+
     //////////////////////////////////Block End: setNewValues///////////////////////////////////////
 
     ////////////////////////////////Block Start: findNewValues//////////////////////////////////////
+
     private void updateBatteryLevel() {
         HMKit.getInstance().getTelematics().sendCommand(new Charging.GetState(), this.serial, new Telematics.CommandCallback() {
             @Override
@@ -73,6 +89,23 @@ public class Vehicle {
                 Command command = CommandResolver.resolve(bytes);
                 Charging.State charging = (Charging.State) command;
                 setBatteryLevel(charging.getBatteryLevel().getValue().floatValue());
+            }
+
+            @Override
+            public void onCommandFailed(TelematicsError error) {
+                Log.d("commandError", error.getMessage());
+            }
+        });
+    }
+
+
+    private void updateBatteryRange() {
+        HMKit.getInstance().getTelematics().sendCommand(new Charging.GetState(), this.serial, new Telematics.CommandCallback() {
+            @Override
+            public void onCommandResponse(Bytes bytes) {
+                Command command = CommandResolver.resolve(bytes);
+                Charging.State charging = (Charging.State) command;
+                setBatteryRange(charging.getEstimatedRange().getValue().getValue());
             }
 
             @Override
