@@ -72,6 +72,7 @@ public class EvRangeConsumersActivity extends Activity {
     TextView txtKmH;
     TextView txtOutsideTemperature;
     TextView txtEstimatedRange;
+    TextView txtBatteryLevelValue;
     HorizontalBarChart hBarChart;
     Switch switchClima;
 
@@ -90,6 +91,7 @@ public class EvRangeConsumersActivity extends Activity {
         progressBarBatteryLevel = findViewById(R.id.progressBarBatteryLevel);
         txtEstimatedRange = findViewById(R.id.txtEstimatedRange);
         switchClima = findViewById(R.id.switchClima);
+        txtBatteryLevelValue = findViewById(R.id.textView8);
 
 
 
@@ -119,7 +121,12 @@ public class EvRangeConsumersActivity extends Activity {
 
     }
 
-
+    public void onClimaSwitch(View v) {
+        if (switchClima.isChecked())
+            progressBarClima.setProgress(10);
+        else
+            progressBarClima.setProgress(0);
+    }
 
     public void onClick(View v){
         Vehicle vehicle = new Vehicle(xSerial);
@@ -144,6 +151,7 @@ public class EvRangeConsumersActivity extends Activity {
                 int batteryLevelFinal = (int) btLevelMultiplied;
 
                 progressBarBatteryLevel.setProgress(batteryLevelFinal);
+                txtBatteryLevelValue.setText(String.valueOf(batteryLevelFinal) + "%");
 
                 txtEstimatedRange.setText(String.valueOf(vehicle.getBatteryRange())+ " Km/h");
 

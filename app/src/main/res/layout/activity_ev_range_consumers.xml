@@ -57,7 +57,8 @@
                     android:layout_marginLeft="70dp"
                     android:layout_marginTop="38dp"
                     android:checked="true"
-                    android:text="Switch" />
+                    android:text="Switch"
+                    android:onClick="onClimaSwitch"/>
 
                 <ProgressBar
                     android:id="@+id/progressBarClima3"
@@ -95,7 +96,7 @@
                     android:layout_marginLeft="210dp"
                     android:layout_marginTop="280dp"
                     android:max="100"
-                    android:progressDrawable="@drawable/pb_drawable_climate" />
+                    android:progressDrawable="@drawable/pb_drawable_batterylevel" />
 
                 <TextView
                     android:id="@+id/textView3"
@@ -114,6 +115,16 @@
                     android:layout_marginLeft="15dp"
                     android:layout_marginTop="280dp"
                     android:text="Battery Level"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="#121111" />
+
+                <TextView
+                    android:id="@+id/textView8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="130dp"
+                    android:layout_marginTop="280dp"
+                    android:text=""
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     android:textColor="#121111" />
 
