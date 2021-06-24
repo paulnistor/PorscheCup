@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#3F51B5</color>
-    <color name="porscheBackground">#e5e6e5</color>
+    <color name="porscheBackground">#ACACAC</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="white">#FFFFFF</color>
@@ -21,4 +21,9 @@
     <color name="segment_active_background">@color/darkClay</color>
     <color name="overview_status_background">@color/lightClay</color>
     <color name="overview_status_text">#ffffffff</color>
+    <color name="chart_climate">#FF003F5F</color>
+    <color name="chart_speed">#FF5C4E91</color>
+    <color name="chart_hwac">#FFCB4593</color>
+    <color name="chart_used">#E5E6E5</color>
+    <color name="chart_available">#FF20D520</color>
 </resources>

@@ -66,7 +66,7 @@
                     android:layout_height="22dp"
                     android:layout_marginLeft="210dp"
                     android:layout_marginTop="40dp"
-                    android:progressDrawable="@drawable/pb_drawable_clima" />
+                    android:progressDrawable="@drawable/pb_drawable_climate" />
 
                 <ProgressBar
                     android:id="@+id/progressBarSpeed"
@@ -184,14 +184,16 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_asset_1" />
 
-            <ProgressBar
-                android:id="@+id/progressBarClima"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="260dp"
-                android:layout_height="22dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="95dp"
-                android:progressDrawable="@drawable/pb_drawable_climate" />
+            <com.github.mikephil.charting.charts.HorizontalBarChart
+                android:id="@+id/activity_main_hbarchart"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginTop="65dp"
+                android:layout_marginBottom="631dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <Button
                 android:id="@+id/btnStart"

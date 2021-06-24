@@ -24,14 +24,22 @@
 package com.highmobility.samples.androidscaffold;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.Switch;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+
+import com.github.mikephil.charting.charts.HorizontalBarChart;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 import com.highmobility.autoapi.Climate;
 import com.highmobility.autoapi.Command;
 import com.highmobility.autoapi.CommandResolver;
@@ -41,9 +49,13 @@ import com.highmobility.hmkit.Telematics;
 import com.highmobility.hmkit.error.DownloadAccessCertificateError;
 import com.highmobility.hmkit.error.TelematicsError;
 import com.highmobility.samples.androidscaffold.utils.Vehicle;
+import com.highmobility.samples.androidscaffold.utils.CustomValueFormatter;
+import com.highmobility.samples.androidscaffold.utils.VehicleHelpers;
 import com.highmobility.value.Bytes;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import timber.log.Timber;
 
@@ -60,7 +72,8 @@ public class EvRangeConsumersActivity extends Activity {
     TextView txtKmH;
     TextView txtOutsideTemperature;
     TextView txtEstimatedRange;
-
+    HorizontalBarChart hBarChart;
+    Switch switchClima;
 
     DeviceSerial xSerial;
     @Override
@@ -76,7 +89,7 @@ public class EvRangeConsumersActivity extends Activity {
         txtOutsideTemperature = findViewById(R.id.txtOutsideTemp);
         progressBarBatteryLevel = findViewById(R.id.progressBarBatteryLevel);
         txtEstimatedRange = findViewById(R.id.txtEstimatedRange);
-
+        switchClima = findViewById(R.id.switchClima);
 
 
 
@@ -114,16 +127,17 @@ public class EvRangeConsumersActivity extends Activity {
         progressBarClima.setProgress(10);
         progressBarBatteryLevel.setProgress(100);
         progressBarOutsideTemp.setProgress(20);
+        createHorizontalBarChart();
         new CountDownTimer( 60000, 1000) {
             @Override
             public void onTick(long l) {
+                double vehicleSpeed = vehicle.getSpeed();
+                progressBarSpeed.setProgress((int) vehicleSpeed);
+                txtKmH.setText(String.valueOf(vehicleSpeed)+ " Km/h");
 
-                progressBarSpeed.setProgress((int) vehicle.getSpeed());
-                txtKmH.setText(String.valueOf(vehicle.getSpeed())+ " Km/h");
 
-
-                String outsideTemp = df2.format(vehicle.getOutsideTemperature());
-                txtOutsideTemperature.setText(outsideTemp + " °C");
+                double outsideTemperature = vehicle.getOutsideTemperature();
+                txtOutsideTemperature.setText(df2.format(outsideTemperature) + " °C");
 
                 double btLevel = vehicle.getBatteryLevel();
                 double btLevelMultiplied = btLevel * 100;
@@ -133,7 +147,16 @@ public class EvRangeConsumersActivity extends Activity {
 
                 txtEstimatedRange.setText(String.valueOf(vehicle.getBatteryRange())+ " Km/h");
 
+                float climateUsage = VehicleHelpers.getClimateBatterUsage(switchClima.isChecked());
+                float speedUsage = VehicleHelpers.getSpeedBatteryUsage(vehicleSpeed);
+                float outsideTemperatureUsage = VehicleHelpers.getOutsideTemperatureBatteryUsage(outsideTemperature);
+                float batteryUsed = 100 - batteryLevelFinal;
+                float batteryAvailable = 100 - (climateUsage + speedUsage + outsideTemperatureUsage + batteryUsed);
 
+
+                float values[] = { batteryAvailable, climateUsage, speedUsage, outsideTemperatureUsage, batteryUsed };
+
+                updateHorizontalBarChart(values);
             }
 
             @Override
@@ -144,6 +167,53 @@ public class EvRangeConsumersActivity extends Activity {
 
     }
 
+    private void createHorizontalBarChart() {
+        hBarChart = findViewById(R.id.activity_main_hbarchart);
+        configureHorizontalBarChart();
+    }
 
+    private void updateHorizontalBarChart(float[] entryValues) {
+        createHorizontalBarChartData(entryValues);
+        hBarChart.invalidate();
+    }
 
+    private void configureHorizontalBarChart() {
+        hBarChart.getDescription().setEnabled(false);
+        hBarChart.getLegend().setEnabled(false);
+        hBarChart.getAxisLeft().setDrawLabels(false);
+        hBarChart.getAxisLeft().setDrawAxisLine(false);
+        hBarChart.getAxisLeft().setDrawGridLines(false);
+        hBarChart.getAxisRight().setDrawLabels(false);
+        hBarChart.getAxisRight().setDrawAxisLine(false);
+        hBarChart.getAxisRight().setDrawGridLines(false);
+        hBarChart.getXAxis().setDrawLabels(false);
+        hBarChart.getXAxis().setDrawAxisLine(false);
+        hBarChart.getXAxis().setDrawGridLines(false);
+        hBarChart.setDrawValueAboveBar(false);
+        hBarChart.setFitBars(true);
+    }
+
+    private void createHorizontalBarChartData(float[] entryValues) {
+        ArrayList<BarEntry> entries = new ArrayList<>();
+        entries.add(new BarEntry(0, entryValues));
+
+        ArrayList<Integer> colors = new ArrayList<>();
+        colors.add(ContextCompat.getColor(getApplicationContext(), R.color.chart_available));
+        colors.add(ContextCompat.getColor(getApplicationContext(), R.color.chart_climate));
+        colors.add(ContextCompat.getColor(getApplicationContext(), R.color.chart_speed));
+        colors.add(ContextCompat.getColor(getApplicationContext(), R.color.chart_hwac));
+        colors.add(ContextCompat.getColor(getApplicationContext(), R.color.chart_used));
+
+        BarDataSet dataSet = new BarDataSet(entries, "");
+        dataSet.setColors(colors);
+        dataSet.setValueTextColor(Color.WHITE);
+        dataSet.setValueTextSize(14f);
+        dataSet.setValueFormatter(new CustomValueFormatter());
+        dataSet.setDrawIcons(false);
+
+        BarData barData = new BarData(dataSet);
+        barData.setBarWidth(0.5f);
+
+        hBarChart.setData(barData);
+    }
 }

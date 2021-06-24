@@ -122,6 +122,7 @@ public class Vehicle {
                 Command command = CommandResolver.resolve(bytes);
                 Climate.State climate = (Climate.State) command;
                 setHvacStatus(climate.getHvacState().getValue().toString());
+                setHvacStatus(climate.getHvacState().getValue().toString());
             }
 
             @Override
